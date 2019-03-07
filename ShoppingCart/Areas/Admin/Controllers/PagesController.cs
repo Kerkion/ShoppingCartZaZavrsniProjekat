@@ -28,5 +28,12 @@ namespace ShoppingCart.Areas.Admin.Controllers
 
             //na kraju na desni klik bilo gde unutar ovog controlera isli smo na AddView(ostavili ime index,za template smo izabrali listu,i posle toga za model dodali PagesVM) i napravili novi view za PageController
         }
+
+        //preusmeravanje za dodavanje stranice
+        //GET : Admin/Pages/AddPage
+       public ActionResult AddPAge()
+       {
+            return View();
+       }
     }
 }
