@@ -31,9 +31,67 @@ namespace ShoppingCart.Areas.Admin.Controllers
 
         //preusmeravanje za dodavanje stranice
         //GET : Admin/Pages/AddPage
+       [HttpGet]
        public ActionResult AddPAge()
        {
             return View();
        }
+
+        //POST : Admin/Pages/AddPage
+        [HttpPost]
+        public ActionResult AddPAge(PageVM model)
+        {
+            //Proveriti model
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            using (ShoppingCartDB db = new ShoppingCartDB())
+            {
+                //Deklarisati Slug
+                string slug;
+                //Inicijalizacija DTO(Data transfer Object) PageDTO
+                PageDTO dto = new PageDTO();
+                //Koristiti da se doda vrednost za title u DTO
+                dto.Title = model.Title;
+                //Proveriti i dodati Slug ako je potrebno
+                if (string.IsNullOrWhiteSpace(model.Slug))
+                {
+                    //Ukoliko je ostavljen white space ili nepostoji uzecemo title zameniti white space sa - i prebaciti u mala slova
+                    slug = model.Title.Replace(" ", "-").ToLower();
+                }
+                else
+                {
+                    //Ukoliko ima nesto napiosano opet cemo prtazna polja zameniti sa - i prebaciti u mala slova
+                    slug = model.Slug.Replace(" ", "-").ToLower();
+                }
+                //Pobrinuti se da su Title i Slug unikatni
+                if (db.Pages.Any(x => x.Title == model.Title || db.Pages.Any(s => s.Slug == slug)))
+                {
+                    ModelState.AddModelError("", "That title or a slug already exists!");
+                    return View(model);
+                }
+
+                //Popuniti ostatak DTO-a
+                dto.Slug = slug;
+                dto.Body = model.Body;
+                dto.HasSidebar = model.HasSidebar;
+                //Ideja je da kada se doda nova stranica uvek bude zadnja(radunamo da nece biti vise od sto stranica napravljeno u isto vreme)
+                dto.Sorting = 100;
+                //Sacuvati DTO
+                db.Pages.Add(dto);
+                //Sacuvati u bazi podataka
+                db.SaveChanges();
+            }
+
+            //Sacuvati privremenu poruku koja ostaje i posle requesta(za razliku od viewbage koji je bas privremen nestaje posle requesta),ovde koristimo da bi ostao i da bi smo mogli da ga dodamo u view
+            TempData["SM"] = "You succesfully added a new page";
+            //Redirektiovati na add page koji je onaj gore get
+            return RedirectToAction("AddPAge");
+
+
+
+        }
     }
 }

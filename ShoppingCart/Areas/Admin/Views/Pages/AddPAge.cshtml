@@ -1,10 +1,17 @@
 ﻿@model ShoppingCart.Models.ViewModels.Pages.PageVM
 
 @{
-    ViewBag.Title = "Add Page";
+	ViewBag.Title = "Add Page";
 }
 
 <h2>Add Page</h2>
+
+@if (TempData["SM"] != null)
+{
+	<div class="alert alert-success">
+		@TempData["SM"]
+	</div>
+}
 
 @using (Html.BeginForm()) 
 {
