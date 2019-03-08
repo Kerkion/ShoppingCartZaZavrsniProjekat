@@ -31,11 +31,11 @@ namespace ShoppingCart.Areas.Admin.Controllers
 
         //preusmeravanje za dodavanje stranice
         //GET : Admin/Pages/AddPage
-       [HttpGet]
-       public ActionResult AddPAge()
-       {
+        [HttpGet]
+        public ActionResult AddPAge()
+        {
             return View();
-       }
+        }
 
         //POST : Admin/Pages/AddPage
         [HttpPost]
@@ -92,6 +92,7 @@ namespace ShoppingCart.Areas.Admin.Controllers
         }
 
         // GET: Admin/Pages/EditPage/id
+        [HttpGet]
         public ActionResult EditPage(int id)
         {
             //Deklarisanje PageVM-a
@@ -111,6 +112,61 @@ namespace ShoppingCart.Areas.Admin.Controllers
             }
             //Vratit View sa modelom
             return View(page);
+        }
+
+        //POST: Admin/Pages/Edit/id
+        [HttpPost]
+        public ActionResult EditPage(PageVM model)
+        {
+            //Proveriti da li postoji model
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            using (ShoppingCartDB db = new ShoppingCartDB())
+            {
+                //Pronaci page id
+                int id = model.Id;
+                //Inicijalizovati slug
+                string slug = "home";
+                //Pronaci page
+                PageDTO page = db.Pages.Find(id);
+                //DTO title
+                page.Title = model.Title;
+                //Proveriti da li je popunjen slug i postaviti ga ukoliko je potrebno
+                if (model.Slug != "home")
+                {
+                    if (string.IsNullOrWhiteSpace(model.Slug))
+                    {
+                        slug = model.Title.Replace(" ", "-").ToLower();
+                    }
+                    else
+                    {
+                        slug = model.Slug.Replace(" ", "-").ToLower();
+                    }
+                }
+                //Proveriti da li su Title i Slug unikatni
+                if (db.Pages.Where(x => x.Id != id).Any(x => x.Title == model.Title) || 
+                    db.Pages.Where(x => x.Id != id).Any(x => x.Slug == slug))
+                {
+                    ModelState.AddModelError("", "Title or Slug already exists!!!");
+                    return View(model);
+                }
+                //DTO ostatak
+                page.Slug = slug;
+                page.Body = model.Body;
+                page.HasSidebar = model.HasSidebar;
+
+                //Sacuvati DTO
+                db.SaveChanges();
+
+            }
+            //Postaviti TempData poruku
+            TempData["SM"] = "You have edited page!";
+            
+            //Redirektovati
+            return RedirectToAction("EditPage");
         }
     }
 }
