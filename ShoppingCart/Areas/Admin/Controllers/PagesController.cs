@@ -168,5 +168,27 @@ namespace ShoppingCart.Areas.Admin.Controllers
             //Redirektovati
             return RedirectToAction("EditPage");
         }
+
+        //Get : Admin/Pages/PageDetails/id
+        public ActionResult PageDetails(int id)
+        {
+            //Deklarisanje PageVM
+            PageVM page;
+            using(ShoppingCartDB db = new ShoppingCartDB())
+            {
+                //pronaci(get) stranicu
+                PageDTO dto = db.Pages.Find(id);
+
+                //potvrditi da postoji takva stranica
+                if(dto == null)
+                {
+                    return Content("That page doesn't exist!!!");
+                }
+                //Inicijalizacija PageVM
+                page = new PageVM(dto);
+
+            }
+            return View(page);
+        }
     }
 }
