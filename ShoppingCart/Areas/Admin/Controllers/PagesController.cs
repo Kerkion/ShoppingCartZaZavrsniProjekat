@@ -89,9 +89,28 @@ namespace ShoppingCart.Areas.Admin.Controllers
             TempData["SM"] = "You succesfully added a new page";
             //Redirektiovati na add page koji je onaj gore get
             return RedirectToAction("AddPAge");
+        }
 
+        // GET: Admin/Pages/EditPage/id
+        public ActionResult EditPage(int id)
+        {
+            //Deklarisanje PageVM-a
+            PageVM page;
 
-
+            using (ShoppingCartDB db = new ShoppingCartDB())
+            {
+                //GET(Uzmi) Stranicu
+                PageDTO dto = db.Pages.Find(id);
+                //Potvrditi da postoji takva stranica
+                if (dto == null)
+                {
+                    return Content("The Page doesn't exist!!!");
+                }
+                //Inicijalizzacija PageVm-a 
+                page = new PageVM(dto);
+            }
+            //Vratit View sa modelom
+            return View(page);
         }
     }
 }
