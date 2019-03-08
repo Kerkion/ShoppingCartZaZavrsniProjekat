@@ -190,5 +190,24 @@ namespace ShoppingCart.Areas.Admin.Controllers
             }
             return View(page);
         }
+
+        //Get: Admin/Pages/DeletePage/id
+        public ActionResult DeletePage(int id)
+        {
+            
+            using(ShoppingCartDB db = new ShoppingCartDB())
+            {
+                //Pronaci page sa id-om u bazi
+                PageDTO dto = db.Pages.Find(id);
+                //Ukloniti taj page
+                db.Pages.Remove(dto);
+                //Sacuvati promene u bazi
+                db.SaveChanges();
+            }
+            //Redirektovati na index
+            return RedirectToAction("Index");
+        }
+
+        
     }
 }
