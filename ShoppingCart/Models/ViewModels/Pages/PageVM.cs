@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Web;
+using System.Web.Mvc;
 
 /// <summary>
 /// Ovo ce biti ViewModel za Admin Page koji je povezan class-om PageDTO
@@ -39,6 +40,7 @@ namespace ShoppingCart.Models.ViewModels.Pages
         //Body ce biti obavezan za stranicu i mora da bude minimalno 3 karaktera duzine i maksimalno Koliko je Maksimalna vrednost inta to jest 2147483647 karaktera (to znace ove anotacije)
         [Required]
         [StringLength(int.MaxValue, MinimumLength = 3)]
+        [AllowHtml]
         public string Body { get; set; }
         public int Sorting { get; set; }
         public bool HasSidebar { get; set; }
