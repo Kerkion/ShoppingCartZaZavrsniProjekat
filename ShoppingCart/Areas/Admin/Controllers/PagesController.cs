@@ -208,6 +208,30 @@ namespace ShoppingCart.Areas.Admin.Controllers
             return RedirectToAction("Index");
         }
 
-        
+        //POST: Admin/Pages/ReorderPages
+        [HttpPost]
+        public void ReorderPages(int[] id)
+        {
+            using(ShoppingCartDB db = new ShoppingCartDB())
+            {
+                // napraviti brojac
+                int br = 1;
+                //Deklarisanje PageDTO
+                PageDTO dto;
+                //Postaviti sorting za svaki page
+                foreach (var item in id)
+                {
+                    //pronadji page sa vrednoscu koju trenutno ima item u db
+                    dto = db.Pages.Find(item);
+                    //postavi soting da bude isti kao i br
+                    dto.Sorting = br;
+                    //sacuvaj promene u db
+                    db.SaveChanges();
+                    //inkrementuj brojac
+                    br++;
+                }
+
+            }
+        }
     }
 }
