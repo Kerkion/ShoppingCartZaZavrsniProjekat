@@ -233,5 +233,42 @@ namespace ShoppingCart.Areas.Admin.Controllers
 
             }
         }
+
+        //Get: Admin/Pages/EditSidebar
+        [HttpGet]
+        public ActionResult EditSidebar()
+        {
+            //Deklarisanje modela
+            SidebarVM sidebar;
+
+            using (ShoppingCartDB db = new ShoppingCartDB())
+            {
+                //Uzimanje DTO
+                SidebarDTO dto = db.Sidebar.Find(1);
+                //Inicijalizacija modela
+                sidebar = new SidebarVM(dto);
+            }
+            //vratiti View sa modelom(sidebar)
+            return View(sidebar);
+        }
+
+        //POST: Admin/Pages/EditSidebar
+        [HttpPost]
+        public ActionResult EditSidebar(SidebarVM model)
+        {
+            using(ShoppingCartDB db = new ShoppingCartDB())
+            {
+                //Uzmi DTO
+                SidebarDTO dto = db.Sidebar.Find(1);
+                //DTO body
+                dto.Body = model.Body;
+                //Sacuvaj
+                db.SaveChanges();
+            }
+            //Postavi TempData poruku
+            TempData["SM"] = "You succesfully edited a sidebar!!!";
+            //Redirect
+            return RedirectToAction("EditSidebar");
+        }
     }
 }

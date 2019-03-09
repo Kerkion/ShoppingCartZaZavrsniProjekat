@@ -11,7 +11,10 @@ namespace ShoppingCart.Models.Data
 {
     public class ShoppingCartDB : DbContext
     {
-        //Setujemo pages
+        //Setujemo pages za tblPages
         public DbSet<PageDTO> Pages { get; set; }
+        //set za tblSidebar
+        public DbSet<SidebarDTO> Sidebar { get; set; }
+
     }
 }
