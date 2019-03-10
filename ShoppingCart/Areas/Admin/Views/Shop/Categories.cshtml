@@ -1,13 +1,13 @@
 ﻿@model IEnumerable<ShoppingCart.Models.ViewModels.Shop.CategoriesVM>
 
 @{
-    ViewBag.Title = "Categories";
+	ViewBag.Title = "Categories";
 }
 
 <h2>Categories</h2>
 
 <div class="new-category">
-	<input type="text" id="newcatname"/>
+	<input type="text" id="newcatname" />
 	<p>
 		<!--Trigger AJAX-->
 		<a href="#" id="newcata">Add a new Category</a>
@@ -24,26 +24,137 @@
 }
 else
 {
-<table class="table sorting" id="pages">
-    <tr class="home">
-        <th>
-            @Html.DisplayNameFor(model => model.Name)
-        </th>
-        <th></th>
-    </tr>
+	<table class="table sorting categories" id="pages">
+		<tr class="home">
+			<th>
+				@Html.DisplayNameFor(model => model.Name)
+			</th>
+			<th></th>
+		</tr>
 
-@foreach (var item in Model)
-{
-    <tr>
-        <td>
-            @Html.EditorFor(modelItem => item.Name, new { htmlAttributes = new { @class = "form-control", @readonly = "readonly" } })
-        </td>
-        <td>
-        <td>
-            @Html.ActionLink("Delete", "DeleteCategory", new { id = item.Id }, new { @class = "delete" })
-        </td>
-    </tr>
+		@foreach (var item in Model)
+		{
+			<tr id="id_@item.Id">
+				<td>
+					@Html.EditorFor(modelItem => item.Name, new { htmlAttributes = new { @class = "form-control", @readonly = "readonly" } })
+				</td>
+				<td>
+				<td>
+					@Html.ActionLink("Delete", "DeleteCategory", new { id = item.Id }, new { @class = "delete" })
+				</td>
+			</tr>
+		}
+
+	</table>
 }
 
-</table>
+@section Scripts{
+	<script src="https://code.jquery.com/ui/1.12.0/jquery-ui.min.js"></script>
+
+	<script>
+		
+		$(function () {
+			//dodaj novu kategoriju
+			var newCatA = $("a#newcata");
+			var newCatTextInp = $("#newcatname");
+			var ajaxText = $("span.ajax-text");
+			var table = $("table#pages tbody");
+
+			newCatTextInp.keyup(function (e) {
+				//key code za enter po ASCII Tabeli
+				if (e.keyCode == 13) {
+					//proizvodi klick na taj anchor(odnosno proizvodi klik u ovom slucaju na add new category)
+					newCatA.click();
+				}
+			});
+
+			newCatA.click(function (e) {
+				//Preventujemo default zato sto nezelimo da nas odvede prema href-u 
+				e.preventDefault();
+
+				var catName = newCatTextInp.val();
+
+				if (catName.length < 3) {
+					alert("Category Name has to be at least 3 character long!!!");
+					return false;
+				}
+				//pokazivanje skrivene ajax slike za ucitavanje
+				ajaxText.show();
+
+				var url = "/Admin/Shop/AddNewCategory";
+
+				$.post(url, { catName: catName }, function (data) {
+
+					//brisemo whitespace  zbog toga sto bi bilo moguce da bez trima ne bude isto s obzirom da ocekujemo od AddNewCategory string.
+					var resp = data.trim();
+
+					if (resp == "titletaken") {
+						ajaxText.html("<span class='alert alert-danger'>That title is taken!</span>");
+						//fade sliku i vratiti nazad sliku za 2 sec
+						setTimeout(function () {
+							ajaxText.fadeOut("fast", function () {
+								ajaxText.html("<img src= /Content/Img/Wedges-3s-16px.gif/>");
+							});
+						}, 2000);
+						return false;
+					} else {
+						if (!$("table#pages").length) {
+							//Ponovo ucitaj stranicu
+							location.reload();
+						} else {
+							ajaxText.html("<span class='alert alert-success'>Category has been added!</span>");
+							//fade sliku i vratiti nazad sliku za 2 sec
+							setTimeout(function () {
+								ajaxText.fadeOut("fast", function () {
+									ajaxText.html("<img src= /Content/Img/Wedges-3s-16px.gif/>");
+								});
+							}, 2000);
+
+							newCatTextInp.val("");
+
+							//napravi kopiju poslednjeg tr-a u tabeli
+							var append = $("table#pages tbody tr:last").clone();
+							//promeni id clonu zbog sortiranja sa onim iz data
+							append.attr("id", "id_" + data);
+							//pronci i promeniti vrednost id na texboxu
+							append.find("#item_Name").val(catName);
+							//promeniti delete link za novo kreirani tr
+							append.find("a.delete").attr("href", "/admin/shop/DeleteCategory/" + data);
+							//dodati u tabelu
+							table.append(append);
+							table.sortable("refresh");
+						}
+					}
+				});
+			});
+
+			/*Odaberi tbody u svakoj tabeli sa id(page) i na nju pozovi funkciju sortable koja je sastavni deo jqueri-ui lib. */
+			$("table#pages tbody").sortable({
+				/*nece vaziti za item koji ima clasu home na sebi*/
+				items: "tr:not(.home)",
+				//Postavi klasu(trenuntu)
+				placeholder: "ui-state-highlight",
+				update: function () {
+					//novi var gde odabitamo tbody i serializujemo ga
+					var ids = $("table#pages tbody").sortable("serialize");
+					//pravimo privremeni url
+					var url = "/Admin/Shop/ReorderCategories";
+					//AJAX poziv u koji ubacujemo url i id odabrane stranice koju vucemo
+					$.post(url, ids, function (data) {
+					});
+				}
+			});
+
+
+			
+			//Zato sto dinamicki stvaramo kategorije moramo da hvatamo na drugaciji nacin klik na delete
+			$("body").on("click", "a.delete", function () {
+				if (!confirm("Confirm Page Deletion")) return false;
+			});
+				
+		});
+		
+		
+	</script>
+
 }
