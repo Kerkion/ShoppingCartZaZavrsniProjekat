@@ -36,6 +36,7 @@ else
 		{
 			<tr id="id_@item.Id">
 				<td>
+					<div class="ajaxdivtd"></div>
 					@Html.EditorFor(modelItem => item.Name, new { htmlAttributes = new { @class = "form-control", @readonly = "readonly" } })
 				</td>
 				<td>
@@ -129,6 +130,7 @@ else
 			});
 
 			/*Odaberi tbody u svakoj tabeli sa id(page) i na nju pozovi funkciju sortable koja je sastavni deo jqueri-ui lib. */
+			//reorganizuj kategorije
 			$("table#pages tbody").sortable({
 				/*nece vaziti za item koji ima clasu home na sebi*/
 				items: "tr:not(.home)",
@@ -148,8 +150,65 @@ else
 
 			
 			//Zato sto dinamicki stvaramo kategorije moramo da hvatamo na drugaciji nacin klik na delete
+			//potvrdi brisanje stranice
 			$("body").on("click", "a.delete", function () {
 				if (!confirm("Confirm Page Deletion")) return false;
+			});
+
+			//Reimenuj Kategoriju
+			var orgTextboxVal;
+			//skinuti readonly atribut ukoliko se iskoristi double klik da na kategoriju da bi mogla da se reimenuje
+			$("table#pages input.text-box").dblclick(function () {
+				orgTextboxVal = $(this).val();
+				//iskljuciti atribut readonly
+				$(this).attr("readonly", false);
+			});
+
+			//trigerujemo blur efekat prilikom klika na enter
+			$("table#pages input.tex-box").keyup(function (e) {
+				if (e.keyCode == 13) {
+					$(this).blur();
+				}
+			});
+
+			//Kada se desi blur efekat
+			$("table#pages input.tex-box").blur(function () {
+				var $this = $(this);
+				//pronadji parent od input textbox-a u ovom slucaju to je tr i unutar tr pronadji element sa zadatom klasom
+				var ajaxdiv = $this.parent().find(".ajaxdivtd");
+				var newCatName = this.val();
+				//koristimo substring na id da bi odsekli prvih 3 caraktera od id(sto ce nam dati pravi id)
+				var id = $this.parent().parent().attr("id").substring(3);
+				var url = "/admin/shop/RenameCategory";
+
+				if (newCatName.length < 3) {
+					alert("Category Name has to be at least 3 character long!!!");
+					//restujemo readonly
+					$this.attr("readonly", true);
+					return false;
+				}
+
+				
+				$.post(url, { newCatName: newCatName, id: id }, function (data) {
+					var resp = data.trim();
+
+					if (resp == "titletaken") {
+						$this.val(orgTextboxVal);
+						ajaxdiv.html("<span class='alert alert-danger'>That title is taken!!!</span>").show();
+					} else {
+						ajaxdiv.html("<span class='alert alert-success'>Category name has been changed!</span>").show();
+					}
+
+					setTimeout(function () {
+						ajaxdiv.fadeOut("fast", function () {
+							ajaxdiv.html("");
+						});
+					}, 2000);
+
+				}).done(function () {
+					$this.attr("readonly", true);
+				});
+
 			});
 				
 		});
