@@ -1,4 +1,5 @@
-﻿using ShoppingCart.Models.Data;
+﻿using PagedList;
+using ShoppingCart.Models.Data;
 using ShoppingCart.Models.ViewModels.Pages;
 using ShoppingCart.Models.ViewModels.Shop;
 using System;
@@ -270,6 +271,38 @@ namespace ShoppingCart.Areas.Admin.Controllers
 
             //Redirekt
             return RedirectToAction("AddProducts");
+        }
+
+        //Get: Admin/Shop/Products
+        public ActionResult Products(int? page,int? catId)
+        {
+            //Deklarisati listu ProductVM
+            List <ProductsVM> listOfProductVM;
+            //Postaviti broj stranice
+            //Ukoliko nije ni jedna stranica prosla kroz query postavi kao prvu stranicu 
+            var pageNumber = page ?? 1;
+
+            using (ShoppingCartDB db = new ShoppingCartDB())
+            {
+                //Inicijalizovati listu
+                listOfProductVM = db.Products.ToArray().Where(x => catId == null || catId == 0 || x.CategoryId == catId).Select(x => new ProductsVM(x)).ToList();
+                //Napuniti categories slelected list
+                //koristicemo ViewBag posto necemo prikazivati svaki model u listi
+                ViewBag.Categories = new SelectList(db.Categories.ToList(),"Id","Name");
+
+                //postaviti izabranu kategoriju
+                ViewBag.SelectedCategory = catId.ToString();
+            }
+
+            //postaviti obelezavanje stranica
+            //prikazivace 25 itema po stranici
+            var onePageOfProducts = listOfProductVM.ToPagedList(pageNumber, 2);
+
+            ViewBag.OnePageOfProducts = onePageOfProducts;
+
+
+            //vratiti View sa modelom
+            return View(listOfProductVM);
         }
     }
 }
