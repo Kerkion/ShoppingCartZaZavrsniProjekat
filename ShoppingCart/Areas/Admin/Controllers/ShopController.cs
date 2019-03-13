@@ -102,5 +102,27 @@ namespace ShoppingCart.Areas.Admin.Controllers
             //Redirektovati na index
             return RedirectToAction("Categories");
         }
+
+        //POST: Admin/Shop/RenameCategory
+        [HttpPost]
+        public string RenameCategory(string newCatName, int id)
+        {
+            using (ShoppingCartDB db = new ShoppingCartDB())
+            {
+                //proveriti da li je ime kategorije unikatno
+                if(db.Categories.Any(x => x.Name == newCatName)){
+                    return "titletaken";
+                }
+                //Uzeti DTO
+                CategoriesDTO dto = db.Categories.Find(id);
+                //Prepraviti DTO
+                dto.Name = newCatName;
+                dto.Slug = newCatName.Replace(" ", "-").ToLower();
+                //Sacuvati
+                db.SaveChanges();
+            }
+            //Vratiti
+            return "done";
+        }
     }
 }

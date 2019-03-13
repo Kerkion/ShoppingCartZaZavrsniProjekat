@@ -162,21 +162,22 @@ else
 				orgTextboxVal = $(this).val();
 				//iskljuciti atribut readonly
 				$(this).attr("readonly", false);
+				
 			});
 
 			//trigerujemo blur efekat prilikom klika na enter
-			$("table#pages input.tex-box").keyup(function (e) {
+			$("table#pages input.text-box").keyup(function (e) {
 				if (e.keyCode == 13) {
 					$(this).blur();
 				}
 			});
 
 			//Kada se desi blur efekat
-			$("table#pages input.tex-box").blur(function () {
+			$("table#pages input.text-box").blur(function () {
 				var $this = $(this);
 				//pronadji parent od input textbox-a u ovom slucaju to je tr i unutar tr pronadji element sa zadatom klasom
 				var ajaxdiv = $this.parent().find(".ajaxdivtd");
-				var newCatName = this.val();
+				var newCatName = $this.val();
 				//koristimo substring na id da bi odsekli prvih 3 caraktera od id(sto ce nam dati pravi id)
 				var id = $this.parent().parent().attr("id").substring(3);
 				var url = "/admin/shop/RenameCategory";

@@ -17,6 +17,8 @@ namespace ShoppingCart.Models.Data
         public DbSet<SidebarDTO> Sidebar { get; set; }
         //set za tblCategories
         public DbSet<CategoriesDTO> Categories { get; set; }
+        //set za tblProducts
+        public DbSet<ProductsDTO> Products { get; set; }
 
     }
 }
