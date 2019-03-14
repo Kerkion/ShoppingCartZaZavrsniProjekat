@@ -295,14 +295,42 @@ namespace ShoppingCart.Areas.Admin.Controllers
             }
 
             //postaviti obelezavanje stranica
-            //prikazivace 25 itema po stranici
-            var onePageOfProducts = listOfProductVM.ToPagedList(pageNumber, 2);
+            //prikazivace 25 itema po stranici(ne zaboravi da setujes na 25 postavio si na 2 zbog provere)
+            var onePageOfProducts = listOfProductVM.ToPagedList(pageNumber, 25);
+
 
             ViewBag.OnePageOfProducts = onePageOfProducts;
 
 
             //vratiti View sa modelom
             return View(listOfProductVM);
+        }
+
+        //Get: Admin/Shop/EditProduct/id
+        public ActionResult EditProduct(int id)
+        {
+            //deklarisanje productVM-a
+            ProductsVM model;
+            using (ShoppingCartDB db = new ShoppingCartDB())
+            {
+                //pronaci product
+                ProductsDTO dto = db.Products.Find(id);
+                //proveriti da li postoji
+                if(dto == null)
+                {
+                    return Content("This item doesn't exists");
+                }
+                //inicijalizovati model
+                model = new ProductsVM(dto);
+                //napraviti select listu
+                model.Categories = new SelectList(db.Categories.ToList(),"Id","Name");
+                //uzeti sve slike iz glaerije
+                model.GalleryImages = Directory.EnumerateFiles(Server.MapPath("~/Images/Uploads/Products/" + id + "/Gallery/Thumbs")).Select(x => Path.GetFileName(x));
+            }
+
+
+            //vratit view sa modelom
+            return View(model);
         }
     }
 }
