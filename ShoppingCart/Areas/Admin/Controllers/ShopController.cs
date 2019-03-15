@@ -145,7 +145,7 @@ namespace ShoppingCart.Areas.Admin.Controllers
 
         //Post: Admin/Shop/AddProducts
         [HttpPost]
-        public ActionResult AddProducts(ProductsVM model,HttpPostedFileBase file)
+        public ActionResult AddProducts(ProductsVM model, HttpPostedFileBase file)
         {
             //proveriti stanje modela
             if (!ModelState.IsValid)
@@ -153,10 +153,10 @@ namespace ShoppingCart.Areas.Admin.Controllers
                 //Zbog slect liste morace da se popuni svaki put pre nego sto se vrati view
                 using (ShoppingCartDB db = new ShoppingCartDB())
                 {
-                    model.Categories = new SelectList(db.Categories.ToList(),"Id","Name");
+                    model.Categories = new SelectList(db.Categories.ToList(), "Id", "Name");
                     return View(model);
                 }
-                
+
             }
             using (ShoppingCartDB db = new ShoppingCartDB())
             {
@@ -168,10 +168,10 @@ namespace ShoppingCart.Areas.Admin.Controllers
                     return View(model);
                 }
             }
-                
-             //Deklarisati product id
-             int id;
-             //Inicijalizovati i sacuvati ProductsDTO
+
+            //Deklarisati product id
+            int id;
+            //Inicijalizovati i sacuvati ProductsDTO
             using (ShoppingCartDB db = new ShoppingCartDB())
             {
                 ProductsDTO product = new ProductsDTO();
@@ -196,7 +196,7 @@ namespace ShoppingCart.Areas.Admin.Controllers
 
             #region Upload slike
             //napraviti direktorijume za cuvanje slika
-            var rootDirectory = new DirectoryInfo(string.Format("{0}Images\\Uploads",Server.MapPath(@"\")));
+            var rootDirectory = new DirectoryInfo(string.Format("{0}Images\\Uploads", Server.MapPath(@"\")));
             //putanja za products folder
             var pathStringProducts = Path.Combine(rootDirectory.ToString(), "Products");
             //putanja za produt id folder
@@ -229,10 +229,10 @@ namespace ShoppingCart.Areas.Admin.Controllers
             {
                 Directory.CreateDirectory(pathStringProductsGalleryThumbs);
             }
-            
+
             //proveriti da li je file uplodovan
 
-            if(file != null && file.ContentLength > 0)
+            if (file != null && file.ContentLength > 0)
             {
                 //uzeti file extension
                 string extension = file.ContentType.ToLower();
@@ -274,10 +274,10 @@ namespace ShoppingCart.Areas.Admin.Controllers
         }
 
         //Get: Admin/Shop/Products
-        public ActionResult Products(int? page,int? catId)
+        public ActionResult Products(int? page, int? catId)
         {
             //Deklarisati listu ProductVM
-            List <ProductsVM> listOfProductVM;
+            List<ProductsVM> listOfProductVM;
             //Postaviti broj stranice
             //Ukoliko nije ni jedna stranica prosla kroz query postavi kao prvu stranicu 
             var pageNumber = page ?? 1;
@@ -288,7 +288,7 @@ namespace ShoppingCart.Areas.Admin.Controllers
                 listOfProductVM = db.Products.ToArray().Where(x => catId == null || catId == 0 || x.CategoryId == catId).Select(x => new ProductsVM(x)).ToList();
                 //Napuniti categories slelected list
                 //koristicemo ViewBag posto necemo prikazivati svaki model u listi
-                ViewBag.Categories = new SelectList(db.Categories.ToList(),"Id","Name");
+                ViewBag.Categories = new SelectList(db.Categories.ToList(), "Id", "Name");
 
                 //postaviti izabranu kategoriju
                 ViewBag.SelectedCategory = catId.ToString();
@@ -307,6 +307,7 @@ namespace ShoppingCart.Areas.Admin.Controllers
         }
 
         //Get: Admin/Shop/EditProduct/id
+        [HttpGet]
         public ActionResult EditProduct(int id)
         {
             //deklarisanje productVM-a
@@ -316,14 +317,14 @@ namespace ShoppingCart.Areas.Admin.Controllers
                 //pronaci product
                 ProductsDTO dto = db.Products.Find(id);
                 //proveriti da li postoji
-                if(dto == null)
+                if (dto == null)
                 {
                     return Content("This item doesn't exists");
                 }
                 //inicijalizovati model
                 model = new ProductsVM(dto);
                 //napraviti select listu
-                model.Categories = new SelectList(db.Categories.ToList(),"Id","Name");
+                model.Categories = new SelectList(db.Categories.ToList(), "Id", "Name");
                 //uzeti sve slike iz glaerije
                 model.GalleryImages = Directory.EnumerateFiles(Server.MapPath("~/Images/Uploads/Products/" + id + "/Gallery/Thumbs")).Select(x => Path.GetFileName(x));
             }
@@ -331,6 +332,118 @@ namespace ShoppingCart.Areas.Admin.Controllers
 
             //vratit view sa modelom
             return View(model);
+        }
+
+        //Post: Admin/Shop/EditProduct/id
+        [HttpPost]
+        public ActionResult EditProduct(ProductsVM model, HttpPostedFileBase file)
+        {
+            //Uzeti product id
+            int id = model.Id;
+
+            using (ShoppingCartDB db = new ShoppingCartDB())
+            {
+                //Napuniti select listu kategorije i galeriju slika
+                model.Categories = new SelectList(db.Categories.ToList(), "Id", "Name");
+            }
+            model.GalleryImages = Directory.EnumerateFiles(Server.MapPath("~/Images/Uploads/Products/" + id + "/Gallery/Thumbs")).Select(x => Path.GetFileName(x));
+            //proveriti stanje modela
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+            //proveriti da li je ime product-a jedinstven0
+            using (ShoppingCartDB db = new ShoppingCartDB())
+            {
+                //ne racunajuci ovaj red da li postoji jos nesto pod ovim imenom ako postoji izbacujemo gresku
+                if(db.Products.Where(x => x.Id != id).Any(x => x.Name == model.Name))
+                {
+                    ModelState.AddModelError("", "That product name already exists!!!");
+                    return View(model);
+                }
+            }
+            using (ShoppingCartDB db = new ShoppingCartDB())
+            {
+                //preraditi product
+                ProductsDTO dto = db.Products.Find(id);
+                dto.Name = model.Name;
+                dto.Slug = model.Name.Replace(" ", "-").ToLower();
+                dto.Price = model.Price;
+                dto.CategoryId = model.CategoryId;
+                dto.ImageName = model.ImageName;
+                dto.Description = model.Description;
+
+                CategoriesDTO cat = db.Categories.FirstOrDefault(x => x.Id == model.CategoryId);
+                dto.CategoryName = cat.Name;
+
+                db.SaveChanges();
+            }
+            //postaviti temp data poruku
+            TempData["SM"] = "You succesfully edited the product!!!";
+
+            #region Upload slike
+
+            //Proveriti da li je uplodovana slika
+            if(file != null && file.ContentLength > 0)
+            {
+                //pronaci koja je eksenzija
+                string extension = file.ContentType.ToLower();
+                //Verifikovati ekstenziju
+                if (extension != "image/jpg" && extension != "image/jpeg" && extension != "image/pjpeg" && extension != "image/gif" && extension != "image/x-png" && extension != "image/png")
+                {
+                    using (ShoppingCartDB db = new ShoppingCartDB())
+                    {
+                        ModelState.AddModelError("", "That format is not supported,the image was not uploaded!!!");
+                        return View(model);
+                    }
+                }
+                //Postaviti koji ce biti Upload Direktorijum putanja
+                var rootDirectory = new DirectoryInfo(string.Format("{0}Images\\Uploads", Server.MapPath(@"\")));
+                //putanja za produt id folder
+                var pathStringProductsId = Path.Combine(rootDirectory.ToString(), "Products\\" + id.ToString());
+                //putanja za product thumbnail folder
+                var pathStringProductsTumb = Path.Combine(rootDirectory.ToString(), "Products\\" + id.ToString() + "\\Thumbs");
+
+                //Obrisati sliku iz direktorijuma
+                DirectoryInfo directory = new DirectoryInfo(pathStringProductsId);
+                DirectoryInfo directory1 = new DirectoryInfo(pathStringProductsTumb);
+
+                foreach (FileInfo file1 in directory.GetFiles())
+                {
+                    file1.Delete();
+                }
+                foreach (FileInfo file2 in directory1.GetFiles())
+                {
+                    file2.Delete();
+                }
+                //Sacuvati ime slike
+
+                string imgName = file.FileName;
+
+                using (ShoppingCartDB db = new ShoppingCartDB())
+                {
+                    ProductsDTO dto = db.Products.Find(id);
+                    dto.ImageName = imgName;
+
+                    db.SaveChanges();
+
+                }
+                //Sacuvati orginalnu i thumb sliku
+                //postaviit putanje za Orginalnu sliku i tumb sliku
+                var path = string.Format("{0}\\{1}", pathStringProductsId, imgName);
+                var path1 = string.Format("{0}\\{1}", pathStringProductsTumb, imgName);
+                //Sacuvati orginalnu sliku
+                file.SaveAs(path);
+                //Napraviti i sacuvati tumb
+                WebImage img = new WebImage(file.InputStream);
+                img.Resize(200, 200);
+                img.Save(path1);
+            }
+
+            #endregion
+
+            //redirectovati
+            return RedirectToAction("EditProduct");
         }
     }
 }
