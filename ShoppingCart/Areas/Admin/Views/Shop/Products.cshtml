@@ -56,7 +56,7 @@
 			</td>
 			<td>
 				@Html.ActionLink("Edit", "EditProduct", new { id = product.Id }) |
-				@Html.ActionLink("Delete", "DeleteProduct", new { id = product.Id })
+				@Html.ActionLink("Delete", "DeleteProduct", new { id = product.Id }, new { @class = "delete" })
 			</td>
 		</tr>
 	}
@@ -87,7 +87,7 @@
 		/*Confirm prilikom brisanja stranice */
 		
 			$("a.delete").click(function () {
-				if (!confirm("Confirm Page Deletion")) return false;
+				if (!confirm("Confirm Product Deletion")) return false;
 			});
 		});
 		

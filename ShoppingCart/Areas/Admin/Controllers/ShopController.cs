@@ -445,5 +445,62 @@ namespace ShoppingCart.Areas.Admin.Controllers
             //redirectovati
             return RedirectToAction("EditProduct");
         }
+
+        //Get: Admin/Shop/DeleteProduct/id
+        public ActionResult DeleteProduct(int id)
+        {
+            using (ShoppingCartDB db = new ShoppingCartDB())
+            {
+                //Obrisati product iz baze podataka
+                ProductsDTO dto = db.Products.Find(id);
+                db.Products.Remove(dto);
+                db.SaveChanges();
+            }
+            //obristai folder koji je veazn za product
+            var rootDirectory = new DirectoryInfo(string.Format("{0}Images\\Uploads", Server.MapPath(@"\")));
+            //putanja za products folder
+            var pathStringProducts = Path.Combine(rootDirectory.ToString(), "Products" + id.ToString());
+
+            if (Directory.Exists(pathStringProducts))
+            {
+                Directory.Delete(pathStringProducts,true);
+            }
+
+            //redirektovati
+            return RedirectToAction("Products");
+        }
+
+        //Post: Admin/Shop/SaveGalleryImages
+        [HttpPost]
+        public void SaveGalleryImages(int id)
+        {
+            //Proci kroz sve fajlove koji su uplodovani
+            foreach (string fileName in Request.Files)
+            {
+                //inicijalizovati fajl
+                HttpPostedFileBase file = Request.Files[fileName];
+                //proveriti da nije prazan 
+                if(file != null && file.ContentLength > 0)
+                {
+                    //namestiti putanje ka direktorijumima za cuvanje
+                    var rootDirectoryPath = new DirectoryInfo(string.Format("{0}Images\\Uploads",Server.MapPath( @"\")));
+                    
+                    var pathStingGalleryImg = Path.Combine(rootDirectoryPath.ToString(), "Products\\" + id.ToString() + "\\Gallery");
+                    var pathStingGalleryImgThumbs = Path.Combine(rootDirectoryPath.ToString(), "Products\\" + id.ToString() + "\\Gallery\\Thumbs");
+
+                    //namestiti i putanju za slike
+                    var path = string.Format("{0}\\{1}", pathStingGalleryImg, file.FileName);
+                    var path1 = string.Format("{0}\\{1}", pathStingGalleryImgThumbs, file.FileName);
+
+                    //Sacuvati orginalnu sliku kao i thumb verziju
+                    file.SaveAs(path);
+                    WebImage img = new WebImage(file.InputStream);
+                    img.Resize(200, 200);
+                    img.Save(path1);
+                }
+
+            }
+
+        }
     }
 }
