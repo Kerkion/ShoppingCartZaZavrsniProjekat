@@ -104,7 +104,7 @@
 
 @foreach (var img in Model.GalleryImages)
 {
-	<div style="display : inline-block">
+	<div style="display : inline-block;margin-right:20px;">
 		<img src="/Images/Uploads/Products/@Model.Id/Gallery/Thumbs/@img" />
 		@Html.ActionLink("Delete", "DeleteImage", "Shop", new { @class = "deleteImg", data_name = img })
 	</div>
@@ -117,7 +117,7 @@
 
 	<script>
 
-		var Id = @Model.Id;
+		
 
 		$(function () {
 
@@ -156,6 +156,23 @@
 					
 				}
 			};
+
+			//Mogucnost da se obrise slika
+			$("a.deleteImg").click(function (e) {
+				e.preventDefault();
+
+				if (!confirm("Confirm Deletion!")) return false;
+
+				var $this = $(this);
+				var url = "/admin/shop/DeleteImage";
+				var imageName = $this.data("name");
+
+				$.post(url, { id: @Model.Id, imageName: imageName }, function (data) {
+					$this.parent().fadeOut("fast");
+				});
+
+			});
+
 		});
 
 

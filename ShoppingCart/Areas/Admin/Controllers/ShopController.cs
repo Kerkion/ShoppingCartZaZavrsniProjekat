@@ -502,5 +502,23 @@ namespace ShoppingCart.Areas.Admin.Controllers
             }
 
         }
+
+        //Post: Admin/Shop/DeleteImage
+        [HttpPost]
+        public void DeleteImage(int id,string imageName)
+        {
+            string pathToImageInGallery = Request.MapPath("~/Images/Uploads/Products/" + id.ToString() + "/Gallery/" + imageName);
+            string pathToImageInGalleryThumbs = Request.MapPath("~/Images/Uploads/Products/" + id.ToString() + "/Gallery/Thumbs/" + imageName);
+
+            if (System.IO.File.Exists(pathToImageInGallery))
+            {
+                System.IO.File.Delete(pathToImageInGallery);
+            }
+            if (System.IO.File.Exists(pathToImageInGalleryThumbs))
+            {
+                System.IO.File.Delete(pathToImageInGalleryThumbs);
+            }
+
+        }
     }
 }
