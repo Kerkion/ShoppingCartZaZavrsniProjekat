@@ -51,7 +51,7 @@ namespace ShoppingCart.Controllers
             return View(model);
         }
 
-
+        //Partial view for Pages
         public ActionResult PagesMenuPartialView()
         {
             //Deklarisati listu pageVM
@@ -63,6 +63,21 @@ namespace ShoppingCart.Controllers
             }
             //vratiti partial sa listom
             return PartialView(pageList);
+        }
+
+        //Partial view for sidebar
+        public ActionResult SidebarPartialView()
+        {
+            //Deklarisati model
+            SidebarVM model;
+            using (ShoppingCartDB db = new ShoppingCartDB())
+            {
+                //Inicijalizovati model
+                SidebarDTO dto = db.Sidebar.Find(1);
+                model = new SidebarVM(dto);
+            }
+            //vratiti model sa view-om
+            return PartialView(model);
         }
     }
 }

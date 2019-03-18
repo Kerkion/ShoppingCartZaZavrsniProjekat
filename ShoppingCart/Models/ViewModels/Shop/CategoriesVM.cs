@@ -8,7 +8,7 @@ namespace ShoppingCart.Models.ViewModels.Shop
 {
     public class CategoriesVM
     {
-        public CategoriesVM()
+        public CategoriesVM(IGrouping<int, CategoriesDTO> x)
         {
 
         }

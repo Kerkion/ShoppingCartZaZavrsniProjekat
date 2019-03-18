@@ -27,6 +27,10 @@
     </div>
 	<div class="container body-content">
 		<div class="row">
+			<div class="col-xs-12 col-md-2">
+				@Html.Action("CategoryMenuPartialView", "Shop")
+			</div>
+
 			<!--Provera za sidebar-->
 			@if (ViewBag.Sidebar == "Yes")
 			{
@@ -34,6 +38,7 @@
 					@RenderBody()
 				</div>
 				<div class="col-xs-12 col-md-3">
+					@Html.Action("SidebarPartialView", "Pages")
 
 				</div>
 			}

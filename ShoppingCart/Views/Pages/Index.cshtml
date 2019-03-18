@@ -1,7 +1,8 @@
 ﻿@model ShoppingCart.Models.ViewModels.Pages.PageVM
 
 @{
-    ViewBag.Title = ViewBag.PageTitle;
+	ViewBag.Title = ViewBag.PageTitle;
+	TempData["HighlightPageTitle"] = ViewBag.PageTitle;
 }
 
 @Html.Raw(Model.Body)

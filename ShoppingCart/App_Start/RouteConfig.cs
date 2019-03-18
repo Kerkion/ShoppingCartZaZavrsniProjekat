@@ -13,6 +13,10 @@ namespace ShoppingCart
         {
             routes.IgnoreRoute("{resource}.axd/{*pathInfo}");
 
+            //Route za Category
+            routes.MapRoute("Shop", "Shop/{action}/{name}", new { controller = "Shop", action = "Index" ,name =UrlParameter.Optional }, new[] { "ShoppingCart.Controllers" });
+            //Route za Sidebar partial view
+            routes.MapRoute("SidebarPartialView", "Pages/SidebarPartialView", new { controller = "Pages", action = "SidebarPartialView" }, new[] { "ShoppingCart.Controllers" });
             //Route za partial view 
             routes.MapRoute("PagesMenuPartialView", "Pages/PagesMenuPartialView", new { controller = "Pages", action = "PagesMenuPartialView" }, new[] { "ShoppingCart.Controllers" });
             //Route za stranice
@@ -25,6 +29,7 @@ namespace ShoppingCart
                  name: "Default",
                  url: "{controller}/{action}/{id}",
                  defaults: new { controller = "Home", action = "Index", id = UrlParameter.Optional }
+                 
              );*/
         }
     }
