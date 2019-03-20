@@ -31,5 +31,27 @@ namespace ShoppingCart.Controllers
           
             return PartialView(categoryVmList);
         }
+
+        //GET : shop/category/name
+        public ActionResult Categories(string name)
+        {
+            //Deklarisati listu ProductVM
+            List<ProductsVM> productsList;
+            using (ShoppingCartDB db = new ShoppingCartDB())
+            {
+                //Pronaci category id
+                CategoriesDTO dto = db.Categories.Where(x => x.Slug == name).FirstOrDefault();
+                int catId = dto.Id;
+                //Inicijalizovati listu
+                productsList = db.Products.ToArray().Where(x => x.CategoryId == catId).Select(x => new ProductsVM(x)).ToList();
+                //pronaci category name
+                var productCategory = db.Products.Where(x => x.CategoryId == catId).FirstOrDefault();
+                //Koristicemo za title
+                ViewBag.CatName = productCategory.CategoryName;
+            }
+
+                //vratit View sa listom
+                return View(productsList);
+        }
     }
 }

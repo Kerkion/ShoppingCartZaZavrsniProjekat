@@ -890,6 +890,7 @@
     <Content Include="Views\Pages\PagesMenuPartialView.cshtml" />
     <Content Include="Views\Pages\SidebarPartialView.cshtml" />
     <Content Include="Views\Shop\CategoryMenuPartialView.cshtml" />
+    <Content Include="Views\Shop\Categories.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Areas\Admin\Models\" />
