@@ -2,6 +2,7 @@
 using ShoppingCart.Models.ViewModels.Shop;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
@@ -52,6 +53,38 @@ namespace ShoppingCart.Controllers
 
                 //vratit View sa listom
                 return View(productsList);
+        }
+
+        //GET : shop/product-details/name
+        [ActionName("product-details")]
+        public ActionResult ProductDetails(string name)
+        {
+            //Deklarisati VM i DTO
+            ProductsVM model;
+            ProductsDTO dto;
+
+            //Inicijalizovati ProductsId
+            int id = 0;
+            using (ShoppingCartDB db = new ShoppingCartDB())
+            {
+                //Proveriti da li postoji product
+                if(!db.Products.Any(x => x.Slug.Equals(name))){
+                    RedirectToAction("Index", "Shop");
+                }
+                //inicijalizovati DTO
+                dto = db.Products.Where(x => x.Slug == name).FirstOrDefault();
+                //Uzeti  id
+                id = dto.Id;
+                //inicijalizovati model
+                model = new ProductsVM(dto);
+            }
+
+            //Pronaci slike
+            //uzeti sve slike iz glaerije
+            model.GalleryImages = Directory.EnumerateFiles(Server.MapPath("~/Images/Uploads/Products/" + id + "/Gallery/Thumbs")).Select(x => Path.GetFileName(x));
+
+            //vratiti View sa modelom
+            return View("ProductDetails",model);
         }
     }
 }
