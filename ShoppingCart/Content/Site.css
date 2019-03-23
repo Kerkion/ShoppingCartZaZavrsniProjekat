@@ -30,3 +30,7 @@ span.ajaxmsg {
 span.loader{
     display: none;
 }
+.ajax-cart{
+    position:relative;
+    top:5px;
+}

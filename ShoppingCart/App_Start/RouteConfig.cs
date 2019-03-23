@@ -12,7 +12,8 @@ namespace ShoppingCart
         public static void RegisterRoutes(RouteCollection routes)
         {
             routes.IgnoreRoute("{resource}.axd/{*pathInfo}");
-
+            //Route za CartController
+            routes.MapRoute("Cart", "Cart/{action}/{id}", new { controller = "Cart", action = "Index", id = UrlParameter.Optional }, new[] { "ShoppingCart.Controllers" });
             //Route za Category
             routes.MapRoute("Shop", "Shop/{action}/{name}", new { controller = "Shop", action = "Index" ,name =UrlParameter.Optional }, new[] { "ShoppingCart.Controllers" });
             //Route za Sidebar partial view

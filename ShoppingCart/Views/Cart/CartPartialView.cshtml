@@ -1,0 +1,7 @@
+﻿@model ShoppingCart.Models.ViewModels.Cart.CartVM
+
+<div class="ajax-cart" style="color:forestgreen;">
+    Your Cart : @Model.Quantity item(s) - $@Model.Price; 
+    <br />
+    @Html.ActionLink("Checkout", "Index");
+</div>

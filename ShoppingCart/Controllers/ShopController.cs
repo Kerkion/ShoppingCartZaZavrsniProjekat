@@ -86,5 +86,7 @@ namespace ShoppingCart.Controllers
             //vratiti View sa modelom
             return View("ProductDetails",model);
         }
+
+
     }
 }
