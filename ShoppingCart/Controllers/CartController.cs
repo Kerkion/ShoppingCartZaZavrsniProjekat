@@ -53,6 +53,8 @@ namespace ShoppingCart.Controllers
                     quantity += item.Quantity;
                     price += item.Price * item.Quantity;
                 }
+                model.Quantity = quantity;
+                model.Price = price;
             }
             else
             {
@@ -116,6 +118,23 @@ namespace ShoppingCart.Controllers
             return PartialView(model);
         }
 
+        //Get: cart/IncrementProduct
+        public JsonResult IncrementProduct(int productId)
+        {
+            //inicijalizovati cart listu
+            List<CartVM> listCart = Session["cart"] as List<CartVM>;
 
+            using (ShoppingCartDB db = new ShoppingCartDB())
+            {
+                //pronaci cartVm koristeci productId
+                CartVM model = listCart.FirstOrDefault(x => x.ProductId == productId);
+                //incrementovati kolicinu
+                model.Quantity++;
+                //sacuvati quantity i price
+                var resault = new { quantity = model.Quantity, price = model.Price};
+                //vratiti json sa podacima
+                return Json(resault,JsonRequestBehavior.AllowGet);
+            }
+        }
     }
 }
