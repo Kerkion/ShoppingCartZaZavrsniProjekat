@@ -53,6 +53,28 @@
         $(function () {
             //fancybox
             $(".fancybox").fancybox();
+
+
+            //Dodaj producte u cart
+            $(".addtocart").click(function (e) {
+                e.preventDefault();
+                //dodajemo klasu da bude inline block
+                $("span.loader").addClass("inlineb");
+                //pripremamo url
+                var url = "/cart/AddToCartPartialView";
+                //AJAX get sa slanjem id stranice kao i prosledjivanjme data u cart partial view
+                $.get(url, { id:@Model.Id}, function (data) {
+                    $(".ajax-cart").html(data);
+                }).done(function () {
+                    $("span.loader").removeClass("inlineb");
+                    $("span.ajaxmsg").addClass("inlineb");
+                    setTimeout(function () {
+                        $("span.ajaxmsg").fadeOut("fast");
+                        $("span.ajaxmsg").removeClass("inlineb");
+                    }, 2000);
+                });
+
+            });
         });
 
     </script>

@@ -1,4 +1,5 @@
-﻿using ShoppingCart.Models.ViewModels.Cart;
+﻿using ShoppingCart.Models.Data;
+using ShoppingCart.Models.ViewModels.Cart;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -63,5 +64,58 @@ namespace ShoppingCart.Controllers
             //vratiti partial view sa modelom
             return PartialView(model);
         }
+
+        //partial view za dodavanje u cart
+        public ActionResult AddToCartPartialView(int id)
+        {
+            //inicijalizovati listu CartVM
+            List<CartVM> cartVmList = Session["cart"] as List<CartVM> ?? new List<CartVM>();
+            //inicijalizovati model CartVM
+            CartVM model = new CartVM();
+
+            using (ShoppingCartDB db = new ShoppingCartDB())
+            {
+                //uzeti product
+                ProductsDTO dto = db.Products.Find(id);
+                //proveriti da li se product nalazi vec u cart-u
+                var productInCart = cartVmList.FirstOrDefault(x => x.ProductId == id);
+                if(productInCart == null)
+                {
+                    //Ukoliko se ne nalazi dodati novi
+                    cartVmList.Add(new CartVM()
+                    {
+                        ProductId = dto.Id,
+                        ProductName = dto.Name,
+                        Price = dto.Price,
+                        Quantity = 1,
+                        Image = dto.ImageName
+                    });
+                }
+                else
+                {
+                    //Ukoliko postoji incrementovati
+                    productInCart.Quantity++;
+                }
+
+            }
+
+            //pronaci total i dodati u model
+            int qty = 0;
+            decimal price = 0m;
+
+            foreach (var item in cartVmList)
+            {
+                qty += item.Quantity;
+                price += item.Price * item.Quantity;
+            }
+            model.Quantity = qty;
+            model.Price = price;
+            //sacuvati cart nazad u session
+            Session["cart"] = cartVmList;
+            //vratiti partial view sa modelom
+            return PartialView(model);
+        }
+
+
     }
 }

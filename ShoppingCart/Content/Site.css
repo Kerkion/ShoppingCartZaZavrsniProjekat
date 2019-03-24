@@ -34,3 +34,6 @@ span.loader{
     position:relative;
     top:5px;
 }
+.inlineb{
+    display:inline-block !important;
+}
