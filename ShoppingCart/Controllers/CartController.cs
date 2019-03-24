@@ -174,7 +174,7 @@ namespace ShoppingCart.Controllers
             {
                 //pronaci cartVm koristeci productId
                 CartVM model = listCart.FirstOrDefault(x => x.ProductId == productId);
-                //
+                //Ukloniti iz liste model
                 listCart.Remove(model);
             }
 

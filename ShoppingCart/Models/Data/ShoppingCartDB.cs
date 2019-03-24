@@ -19,6 +19,12 @@ namespace ShoppingCart.Models.Data
         public DbSet<CategoriesDTO> Categories { get; set; }
         //set za tblProducts
         public DbSet<ProductsDTO> Products { get; set; }
+        //set za Users tabelu
+        public DbSet<UserDTO> Users { get; set; }
+        //set za Roles tabelu
+        public DbSet<RolesDTO> Roles { get; set; }
+        //set za User Roles tableu
+        public DbSet<UserRolesDTO> UserRoles { get; set; }
 
     }
 }

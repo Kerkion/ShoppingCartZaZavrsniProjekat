@@ -12,6 +12,9 @@ namespace ShoppingCart
         public static void RegisterRoutes(RouteCollection routes)
         {
             routes.IgnoreRoute("{resource}.axd/{*pathInfo}");
+
+            //Route za Account
+            routes.MapRoute("Account", "Account/{action}/{id}", new { controller = "Account", action = "Index", id = UrlParameter.Optional }, new[] { "ShoppingCart.Controllers" });
             //Route za CartController
             routes.MapRoute("Cart", "Cart/{action}/{id}", new { controller = "Cart", action = "Index", id = UrlParameter.Optional }, new[] { "ShoppingCart.Controllers" });
             //Route za Category
