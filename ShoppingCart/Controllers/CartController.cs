@@ -136,5 +136,48 @@ namespace ShoppingCart.Controllers
                 return Json(resault,JsonRequestBehavior.AllowGet);
             }
         }
+
+        //Get: cart/DecrementProduct
+        public JsonResult DecrementProduct(int productId)
+        {
+            //inicijalizovati cart listu
+            List<CartVM> listCart = Session["cart"] as List<CartVM>;
+
+            using (ShoppingCartDB db = new ShoppingCartDB())
+            {
+                //pronaci cartVm koristeci productId
+                CartVM model = listCart.FirstOrDefault(x => x.ProductId == productId);
+                //dekrementovati kolicinu
+                if(model.Quantity > 1)
+                {
+                    model.Quantity--;
+                }
+                else
+                {
+                    model.Quantity = 0;
+                    listCart.Remove(model);
+                }
+                
+                //sacuvati quantity i price
+                var resault = new { quantity = model.Quantity, price = model.Price };
+                //vratiti json sa podacima
+                return Json(resault, JsonRequestBehavior.AllowGet);
+            }
+        }
+        //Get: cart/RemoveProduct
+        public void RemoveProduct(int productId)
+        {
+            //inicijalizovati cart listu
+            List<CartVM> listCart = Session["cart"] as List<CartVM>;
+
+            using (ShoppingCartDB db = new ShoppingCartDB())
+            {
+                //pronaci cartVm koristeci productId
+                CartVM model = listCart.FirstOrDefault(x => x.ProductId == productId);
+                //
+                listCart.Remove(model);
+            }
+
+        }
     }
 }

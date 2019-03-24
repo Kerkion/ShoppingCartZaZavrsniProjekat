@@ -111,6 +111,56 @@ else
                 });
             });
 
+            /*dekrementuj product */
+            $("a.decrement-product").click(function (e) {
+                e.preventDefault();
+
+                //prosledjeno AjAX-om
+                var productId = $(this).data("id");
+                var url = "/cart/DecrementProduct";
+                var $this = $(this);
+
+                $.getJSON(url, { productId: productId }, function (data) {
+
+                    if (data.quantity <= 0)
+                    {
+                        $this.parent().parent().fadeOut("fast", function () {
+                            location.reload();
+                        });
+                    }
+                    else
+                    {
+                        $("td.quantity" + productId).html(data.quantity);
+
+                        var price = data.quantity * data.price;
+
+                        var priceHtml = "$" + price.toFixed(2);
+
+                        $("td.total" + productId).html(priceHtml);
+
+                        var grandTotal = parseFloat($("td.grandtotal span").text());
+
+                        var gt = (grandTotal - data.price).toFixed(2);
+
+                        $("td.grandtotal span").text(gt);
+                    }
+
+                });
+            });
+            /*Otkloni product */
+            $("a.remove-product").click(function (e) {
+                e.preventDefault();
+
+                //prosledjeno AjAX-om
+                var productId = $(this).data("id");
+                var url = "/cart/RemoveProduct";
+                var $this = $(this);
+
+                $.get(url, { productId: productId }, function (data) {
+                    location.reload();
+                });
+            });
+
 		});
 		
 			
