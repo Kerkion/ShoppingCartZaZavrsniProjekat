@@ -135,6 +135,29 @@ namespace ShoppingCart.Controllers
         {
             FormsAuthentication.SignOut();
             return Redirect("~/account/login");
+
+        }
+
+        //partial view za pokazivanje imena i prezimena ulogovanog korisinika
+        public ActionResult UserPartialNav()
+        {
+            //pronadji username
+            string username = User.Identity.Name;
+            //deklarisati model
+            NavbarUserPartialVM model;
+            using (ShoppingCartDB db = new ShoppingCartDB())
+            {
+                //pronaci korisnika
+                UserDTO dto = db.Users.FirstOrDefault(x => x.Username == username);
+                //Izgraditi model
+                model = new NavbarUserPartialVM()
+                {
+                    FirstName = dto.FirstName,
+                    LastName = dto.LastName
+                };
+            }
+            //Vratiti parcijalni view sa modelom 
+            return PartialView(model);
         }
     }
 }
