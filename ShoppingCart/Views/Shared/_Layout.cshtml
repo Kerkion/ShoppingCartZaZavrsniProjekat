@@ -37,15 +37,36 @@
                         }
 
                     }
-
-                    @if (Request.IsAuthenticated)
+                    @if (Request.IsAuthenticated && User.IsInRole("user"))
                     {
-                        <li>@Html.Action("UserPartialNav","Account",new { area = "" })</li>
+                        if (ViewBag.Title == "User Profile")
+                        {
+                            <li class="active">@Html.Action("UserPartialNav", "Account", new { area = "" })</li>
+                        }
+                        else
+                        {
+                            <li>@Html.Action("UserPartialNav", "Account", new { area = "" })</li>
+                        }
                     }
+
                 </ul>
-                <ul class="navbar-collapse collapse navbar-right">
-                    @Html.Action("CartPartialView", "Cart")
-                </ul>
+
+                @if (Request.IsAuthenticated && User.IsInRole("admin"))
+                {
+                    <ul class="navbar-collapse collapse navbar-right adminarea">
+                        <li>@Html.ActionLink("Admin Area", "Index", "Dashboard", new { area = "Admin"},null)</li>
+                    </ul>
+                }
+                else
+                {
+                    if (ViewBag.Title != "Cart Details")
+                    {
+                        <ul class="navbar-collapse collapse navbar-right">
+                            @Html.Action("CartPartialView", "Cart")
+                        </ul>
+                    }
+                }
+
             </div>
         </div>
     </div>
