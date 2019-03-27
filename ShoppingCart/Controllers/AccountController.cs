@@ -138,7 +138,7 @@ namespace ShoppingCart.Controllers
 
         }
 
-        //partial view za pokazivanje imena i prezimena ulogovanog korisinika
+        //partial view za prikazivanje imena i prezimena ulogovanog korisinika
         public ActionResult UserPartialNav()
         {
             //pronadji username
@@ -158,6 +158,86 @@ namespace ShoppingCart.Controllers
             }
             //Vratiti parcijalni view sa modelom 
             return PartialView(model);
+        }
+
+        // GET: /account/user-profile
+        [HttpGet]
+        [ActionName("user-profile")]
+        public ActionResult UserProfile()
+        {
+            //proncai username
+            string username = User.Identity.Name;
+
+            //deklarisati model
+            UserProfileVM model;
+            using (ShoppingCartDB db = new ShoppingCartDB())
+            {
+                //pronaci korisnika
+                UserDTO dto = db.Users.FirstOrDefault(x => x.Username == username);
+
+                //izgraditi model
+                model = new UserProfileVM(dto);
+            }
+
+            //vratiti View sa modelom
+            return View("UserProfile", model);
+        }
+
+        // post: /account/user-profile
+        [HttpPost]
+        [ActionName("user-profile")]
+        public ActionResult UserProfile(UserProfileVM model)
+        {
+            //Proveriti stanje modela
+            if (!ModelState.IsValid)
+            {
+                return View("UserProfile", model);
+            }
+
+            //proveriti da lis e passwordi podudaraju
+
+            if (!string.IsNullOrEmpty(model.Password))
+            {
+                if (!model.Password.Equals(model.ConfirmPassword))
+                {
+                    ModelState.AddModelError("", "Password and Confirm Password fields doesn't match");
+                    return View("UserProfile", model);
+                }
+            }
+
+            
+
+            using (ShoppingCartDB db = new ShoppingCartDB())
+            {
+                //pronaci username
+                string username = User.Identity.Name;
+                //proveriti da li je jedinstven username
+                if (db.Users.Where(x => x.Id != model.Id).Any(x => x.Username == username))
+                {
+                    ModelState.AddModelError("", "That Username is taken!");
+                    model.Username = "";
+                    return View("UserProfile", model);
+                }
+
+                //Editovati DTO
+                UserDTO dto = db.Users.Find(model.Id);
+                dto.FirstName = model.FirstName;
+                dto.LastName = model.LastName;
+                dto.Username = model.Username;
+                dto.Email = model.Email;
+
+                if (!string.IsNullOrEmpty(model.Password))
+                {
+                    dto.Password = model.Password;
+                }
+
+                //Sacuvati DTO
+                db.SaveChanges();
+            }
+            //postaviti TempData poruku
+            TempData["SM"] = "You successfully edited your profile";
+            //Redirektovati
+            return Redirect("~/account/user-profile");
         }
     }
 }
