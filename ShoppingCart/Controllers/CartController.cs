@@ -179,5 +179,14 @@ namespace ShoppingCart.Controllers
             }
 
         }
+
+        //partialview za paypal(za povecivanje inkrementovanja i dekrementovanja producta)
+        public ActionResult PaypalPartialView()
+        {
+            //inicijalizovati cart listu
+            List<CartVM> listCart = Session["cart"] as List<CartVM>;
+
+            return PartialView(listCart);
+        }
     }
 }

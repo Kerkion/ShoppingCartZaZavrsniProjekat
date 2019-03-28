@@ -37,3 +37,24 @@ span.loader{
 .inlineb{
     display:inline-block !important;
 }
+ul.adminarea{
+    position:relative;
+    top:15px;
+}
+.ajaxBg{
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: white;
+    display: none;
+}
+.ajaxBg span {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate3d(-50%,-50%,0);
+}
+form.paypalForm{
+    position:absolute;
+    left: -3000px;
+}
