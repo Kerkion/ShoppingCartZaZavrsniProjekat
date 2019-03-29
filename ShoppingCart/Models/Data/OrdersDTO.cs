@@ -12,8 +12,8 @@ namespace ShoppingCart.Models.Data
     {
         [Key]
         public int OrderID { get; set; }
-        public int UserID { get; set; }
-        public DateTime CreatedAt { get; set; }
+        public int? UserID { get; set; }
+        public DateTime? CreatedAt { get; set; }
 
         [ForeignKey("UserID")]
         public virtual UserDTO Users { get; set; }

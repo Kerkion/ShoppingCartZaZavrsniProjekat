@@ -1,4 +1,5 @@
 ﻿using PagedList;
+using ShoppingCart.Areas.Admin.Models.ViewModels.Shop;
 using ShoppingCart.Models.Data;
 using ShoppingCart.Models.ViewModels.Pages;
 using ShoppingCart.Models.ViewModels.Shop;
@@ -519,6 +520,60 @@ namespace ShoppingCart.Areas.Admin.Controllers
                 System.IO.File.Delete(pathToImageInGalleryThumbs);
             }
 
+        }
+
+        //Get: Admin/Shop/Orders
+        public ActionResult Orders()
+        {
+            //inicijalizovati listu OrdersForAdminVM
+            List<OrdersForAdminVm> orderAdmin = new List<OrdersForAdminVm>();
+
+            using (ShoppingCartDB db = new ShoppingCartDB())
+            {
+                //Inicijalizovati listu OrdersVM
+                List<OrderVm> orders = db.Orders.ToArray().Select(x => new OrderVm(x)).ToList();
+
+                //proci kroz listu OrderVM
+                foreach (var item in orders)
+                {
+                    //inicijalizovati Dictionay
+                    Dictionary<string, int> productsAndQuantity = new Dictionary<string, int>();
+                    //deklarisati total i inicijalizovati
+                    decimal total = 0m;
+                    //inicijalizovati listu OrderDetailsDTO
+                    List<OrderDetailsDTO> orderDetails = db.OrderDetails.Where(x => x.OrderID == item.OrderID).ToList();
+                    //pronaci Username
+                    UserDTO user = db.Users.Where(x => x.Id == item.UserID).FirstOrDefault();
+                    string username = user.Username;
+                    //proci kroz listu
+                    foreach (var order in orderDetails)
+                    {
+                        //uzeti product
+                        ProductsDTO product = db.Products.Where(x => x.Id == order.OrderID).FirstOrDefault();
+                        //uzeti cenu producta
+                        decimal price = product.Price;
+                        //uzeti ime producta
+                        string productName = product.Name;
+                        //dodati u Dictionary
+                        productsAndQuantity.Add(productName, order.Quantity);
+                        //pronaci total
+                        total += price * order.Quantity;
+                    }
+                    //Dodati u listu orderAdmin
+                    orderAdmin.Add(new OrdersForAdminVm()
+                    {
+                        OrderNumber = item.OrderID,
+                        Username = username,
+                        Total = total,
+                        ProductsAndQuantity = productsAndQuantity,
+                        CreatedAt = item.CreatedAt
+
+                    });
+                }
+            }
+
+            //vratiti view sa orderAdmin listom
+            return View(orderAdmin);
         }
     }
 }
