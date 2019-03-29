@@ -71,29 +71,34 @@
         </div>
     </div>
 	<div class="container body-content">
-		<div class="row">
-			<div class="col-xs-12 col-md-2">
-				@Html.Action("CategoryMenuPartialView", "Shop")
-			</div>
+        <div class="row">
+            <div class="ajaxBg">
+                <span>
+                    <img src="~/Content/Img/Wedges-3s-16px.gif" />
+                </span>
+            </div>
+            <div class="col-xs-12 col-md-2">
+                @Html.Action("CategoryMenuPartialView", "Shop")
+            </div>
 
-			<!--Provera za sidebar-->
-			@if (ViewBag.Sidebar == "Yes")
-			{
-				<div class="col-xs-12 col-md-7">
-					@RenderBody()
-				</div>
-				<div class="col-xs-12 col-md-3">
-					@Html.Action("SidebarPartialView", "Pages")
+            <!--Provera za sidebar-->
+            @if (ViewBag.Sidebar == "Yes")
+            {
+                <div class="col-xs-12 col-md-7">
+                    @RenderBody()
+                </div>
+                <div class="col-xs-12 col-md-3">
+                    @Html.Action("SidebarPartialView", "Pages")
 
-				</div>
-			}
-			else
-			{
-				<div class="col-xs-12 col-md-10">
-					@RenderBody()
-				</div>
-			}
-		</div>
+                </div>
+            }
+            else
+            {
+                <div class="col-xs-12 col-md-10">
+                    @RenderBody()
+                </div>
+            }
+        </div>
 		<hr />
 		<footer>
 			<p>&copy; @DateTime.Now.Year - My ASP.NET Application</p>

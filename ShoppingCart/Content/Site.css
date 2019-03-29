@@ -41,18 +41,18 @@ ul.adminarea{
     position:relative;
     top:15px;
 }
-.ajaxBg{
+.ajaxBg {
     position: absolute;
     width: 100%;
     height: 100%;
     background: white;
     display: none;
+    z-index: 1;
 }
 .ajaxBg span {
     position: absolute;
-    top: 50%;
+    top: 30%;
     left: 50%;
-    transform: translate3d(-50%,-50%,0);
 }
 form.paypalForm{
     position:absolute;

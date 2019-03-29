@@ -14,10 +14,6 @@
 else
 {
 
-    <div class="ajaxBg"><span>
-    <img src="~/Content/Img/Wedges-3s-16px.gif" />
-    </span></div>
-
     <table class="table">
         <tr>
 
@@ -89,7 +85,7 @@ else
         <form class="paypalForm" action="https://www.sandbox.paypal.com/cgi-bin/webscr" method="post">
             <input type="hidden" name="cmd" value="_cart">
             <input type="hidden" name="upload" value="1">
-            <input type="hidden" name="business" value=" kerkion1984-facilitator@gmail.com">
+            <input type="hidden" name="business" value="kerkion1984-facilitator@gmail.com">
 
             @foreach (var item in Model)
             {
@@ -185,7 +181,7 @@ else
             $("a.remove-product").click(function (e) {
                 e.preventDefault();
 
-                //prosledjeno AjAX-om
+                //za prosledjivanje AjAX-om
                 var productId = $(this).data("id");
                 var url = "/cart/RemoveProduct";
                 var $this = $(this);
@@ -194,6 +190,25 @@ else
                     location.reload();
                 });
             });
+
+            /*Postavi porudzbenicu */
+            $("a.placeOrder").click(function (e) {
+                e.preventDefault();
+
+                var $this = $(this);
+                
+                var url = "/cart/PlaceOrder";
+                
+                $(".ajaxBg").show();
+
+                $.post(url, { }, function (data) {
+                    $(".ajaxBg span").text("Thank you for your order.You will now be redirected to Paypal.");
+                    setTimeout(function () {
+                        $('form input[name="submit"]').click();
+                    }, 2000);
+                });
+            });
+
 
         });
 

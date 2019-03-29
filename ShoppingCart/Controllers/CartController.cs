@@ -3,6 +3,8 @@ using ShoppingCart.Models.ViewModels.Cart;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
+using System.Net.Mail;
 using System.Web;
 using System.Web.Mvc;
 
@@ -187,6 +189,61 @@ namespace ShoppingCart.Controllers
             List<CartVM> listCart = Session["cart"] as List<CartVM>;
 
             return PartialView(listCart);
+        }
+
+        //Post: cart/PlaceOrder
+        [HttpPost]
+        public void PlaceOrder()
+        {
+            //uzeti cart listu
+            List<CartVM> listCart = Session["cart"] as List<CartVM>;
+            //pronaci username
+            string username = User.Identity.Name;
+            //inicijalizovati orderId
+            int orderID = 0;
+
+            using (ShoppingCartDB db = new ShoppingCartDB())
+            {
+                //inicijalizovati OrdersDTO
+                OrdersDTO ordersDTO = new OrdersDTO();
+                //Pronaci UserId
+                var query = db.Users.FirstOrDefault(x => x.Username == username);
+                int userId = query.Id;
+                //dodati u OrdersDTO i sacuvati
+                ordersDTO.UserID = userId;
+                ordersDTO.CreatedAt = DateTime.Now;
+
+                db.Orders.Add(ordersDTO);
+
+                db.SaveChanges();
+                //Pronaci ubaceni id
+                orderID = ordersDTO.OrderID;
+                //inicijalizovati OrderDetailsDTO
+                OrderDetailsDTO orderDetailsDTO = new OrderDetailsDTO();
+                //dodati u OrderDetailsDTO
+                foreach (var item in listCart)
+                {
+                    orderDetailsDTO.OrderID = orderID;
+                    orderDetailsDTO.UserID = userId;
+                    orderDetailsDTO.ProductID = item.ProductId;
+                    orderDetailsDTO.Quantity = item.Quantity;
+
+                    db.OrderDetails.Add(orderDetailsDTO);
+                    db.SaveChanges();
+
+                }
+            }
+
+            //poslati email admin-u
+            var client = new SmtpClient("smtp.mailtrap.io", 2525)
+            {
+                Credentials = new NetworkCredential("600ce557b90f2a", "bdc3aca380f02f"),
+                EnableSsl = true
+            };
+            client.Send("Admin@example.com", "Admin@example.com", "New Order", "You have a new order, order number is : " + orderID);
+            Console.WriteLine("Sent");
+            //resetovati ssesion
+            Session["cart"] = null;
         }
     }
 }
