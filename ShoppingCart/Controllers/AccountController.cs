@@ -1,6 +1,7 @@
 ﻿using ShoppingCart.Models.Account;
 using ShoppingCart.Models.Data;
 using ShoppingCart.Models.ViewModels.Account;
+using ShoppingCart.Models.ViewModels.Shop;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -238,6 +239,57 @@ namespace ShoppingCart.Controllers
             TempData["SM"] = "You successfully edited your profile";
             //Redirektovati
             return Redirect("~/account/user-profile");
+        }
+
+        // GET: /account/Orders
+        public ActionResult Orders()
+        {
+            //Inicijalizovati listu OrderForUsersVM
+            List<OrderForUsersVM> userOrders = new List<OrderForUsersVM>();
+
+            using (ShoppingCartDB db = new ShoppingCartDB())
+            {
+                //Pronaci user ID
+                UserDTO user = db.Users.Where(x => x.Username == User.Identity.Name).FirstOrDefault();
+                int userId = user.Id;
+                //Inicijalizovati listu orderVm
+                List<OrderVm> orders = db.Orders.Where(x => x.UserID == user.Id).ToArray().Select(x => new OrderVm(x)).ToList();
+                //proci kroz listu
+                foreach (var item in orders)
+                {
+                    //inicijalizovati Dictionary
+                    Dictionary<string, int> productAndQuantity = new Dictionary<string, int>();
+                    //Deklarisati total
+                    decimal total = 0m;
+                    //Inicijalizovati listu  OrderDetailsDTO
+                    List<OrderDetailsDTO> orderDetails = db.OrderDetails.Where(x => x.OrderID == item.OrderID).ToList();
+                    //Proci kroz listu
+                    foreach (var order in orderDetails)
+                    {
+                        //Pronaci product
+                        ProductsDTO dto = db.Products.Where(x => x.Id == order.ProductID).FirstOrDefault();
+                        //Pronaci cenu producta
+                        decimal price = dto.Price;
+                        //pronaci Ime Producta
+                        string productName = dto.Name;
+                        //popuniti Dictionary
+                        productAndQuantity.Add(productName, order.Quantity);
+                        //Pronaci total
+                        total += order.Quantity * price;
+                    }
+                    //Popuniti listu OrderForUsersVM
+                    userOrders.Add(new OrderForUsersVM()
+                    {
+                        OrderNumber = item.OrderID,
+                        Total = total,
+                        ProductsAndQuantity = productAndQuantity,
+                        CreatedAt = item.CreatedAt
+                    });
+                }
+
+            }
+            //vratiti view sa listom OrderForUsersV
+            return View(userOrders);
         }
     }
 }
