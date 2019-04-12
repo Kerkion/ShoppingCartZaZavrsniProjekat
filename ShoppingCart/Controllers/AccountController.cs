@@ -132,6 +132,7 @@ namespace ShoppingCart.Controllers
         }
 
         // Post: /account/Logout
+        [Authorize]
         public ActionResult Logout()
         {
             FormsAuthentication.SignOut();
@@ -140,6 +141,7 @@ namespace ShoppingCart.Controllers
         }
 
         //partial view za prikazivanje imena i prezimena ulogovanog korisinika
+        [Authorize]
         public ActionResult UserPartialNav()
         {
             //pronadji username
@@ -164,6 +166,7 @@ namespace ShoppingCart.Controllers
         // GET: /account/user-profile
         [HttpGet]
         [ActionName("user-profile")]
+        [Authorize]
         public ActionResult UserProfile()
         {
             //proncai username
@@ -187,6 +190,7 @@ namespace ShoppingCart.Controllers
         // post: /account/user-profile
         [HttpPost]
         [ActionName("user-profile")]
+        [Authorize]
         public ActionResult UserProfile(UserProfileVM model)
         {
             //Proveriti stanje modela
@@ -242,6 +246,7 @@ namespace ShoppingCart.Controllers
         }
 
         // GET: /account/Orders
+        [Authorize(Roles ="user")]
         public ActionResult Orders()
         {
             //Inicijalizovati listu OrderForUsersVM
