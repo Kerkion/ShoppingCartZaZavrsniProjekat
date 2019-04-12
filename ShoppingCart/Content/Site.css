@@ -58,3 +58,6 @@ form.paypalForm{
     position:absolute;
     left: -3000px;
 }
+.row{
+    position:relative;
+}
